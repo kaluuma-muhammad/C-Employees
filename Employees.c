@@ -23,7 +23,7 @@ void display() {
     FILE *fp;
     struct employee employees;
 
-    fp = fopen("Employees.dat", "rb");
+    fp = fopen("Employees.dat", "r");
     printf("\n   ***** All Employees *****");
     printf("\n\t -------------");
 
@@ -77,15 +77,181 @@ void store() {
 }
 
 void view() {
-    /* code */
+    char fullName[50];
+    struct employee employee;
+    FILE *fp;
+
+    printf("\nEnter employee's full name:\t");
+    takeInput(fullName);
+
+    fp = fopen("Employees.dat", "r");
+    while(fread(&employee, sizeof(struct employee), 1, fp) > 0) {
+        if (!strcmp(employee.fullName, fullName)) {
+            system("cls");
+            printf("\n\t\t\t\t\tEmployee %s", employee.fullName);
+
+            printf("\n\n|Names:\t\t%s", employee.fullName);
+            printf("\n\n|Email:\t\t%s", employee.email);
+            printf("\n\n|Contact:\t%s", employee.contact);
+            printf("\n\n|Position:\t%s", employee.position);
+            printf("\n\n|Country:\t%s", employee.country);
+            printf("\n\n|Address:\t%s", employee.address);
+            printf("\n\n|Salary:\t%s", employee.salary);
+            printf("\n\n|Gender:\t%s", employee.gender);
+            printf("\n-------------------------------\n");
+        } else {
+            printf("No employee found");
+            printf("\n-------------------------------\n");
+        }
+    }
+    fclose(fp);
+}
+
+void append() {
+    system("cls");
+    FILE *fp;
+    struct employee emp;
+
+    printf("Enter employee's full name:\t");
+    takeInput(emp.fullName);
+    printf("Enter employee's email:\t\t");
+    takeInput(emp.email);
+    printf("Enter employee's contact:\t");
+    takeInput(emp.contact);
+    printf("Enter employee's position:\t");
+    takeInput(emp.position);
+    printf("Enter employee's country:\t");
+    takeInput(emp.country);
+    printf("Enter employee's address:\t");
+    takeInput(emp.address);
+    printf("Enter employee's salary:\t");
+    takeInput(emp.salary);
+    printf("Enter employee's gender:\t");
+    takeInput(emp.gender);
+
+    fp = fopen("Employees.dat", "a");
+    fwrite(&emp, sizeof(struct employee), 1, fp);
+
+    if (fwrite != 0) {
+        printf("\nEmployee %s successfully registered.", emp.fullName);
+        printf("\n-----------------------------------------\n\n");
+    } else {
+        printf("\n\nOps! Something went wrong :(");
+        printf("\n\n\n\n");
+    }
+    fclose(fp);
 }
 
 void update() {
-    /* code */
+    char fullName[50];
+    struct employee emp;
+    FILE *fp, *fp1;
+    int found = 0;
+
+    printf("\nEnter employee's full name to update:\t");
+    takeInput(fullName);
+
+    fp = fopen("Employees.dat", "r");
+    fp1 = fopen("Temp.dat", "w");
+
+    while(fread(&emp, sizeof(struct employee), 1, fp) > 0) {
+        if (!strcmp(emp.fullName, fullName)) {
+            found = 1;
+            system("cls");
+            printf("\n\t\t\t\t\tUpdate Employee %s", emp.fullName);
+
+            printf("\n\nEnter new employee's full name:\t");
+            takeInput(emp.fullName);
+            printf("Enter new employee's email:\t");
+            takeInput(emp.email);
+            printf("Enter new employee's contact:\t");
+            takeInput(emp.contact);
+            printf(" new employee's position:\t");
+            takeInput(emp.position);
+            printf("Enter new employee's country:\t");
+            takeInput(emp.country);
+            printf("Enter new employee's address:\t");
+            takeInput(emp.address);
+            printf("Enter new employee's salary:\t");
+            takeInput(emp.salary);
+            printf("Enter new employee's gender:\t");
+            takeInput(emp.gender);
+        }
+        fwrite(&emp, sizeof(struct employee), 1, fp1);
+    }
+    fclose(fp1);
+    fclose(fp);
+
+    if (found) {
+        fp = fopen("Employees.dat", "w");
+        fp1 = fopen("Temp.dat", "r");
+
+        while(fread(&emp, sizeof(struct employee), 1, fp1) > 0) {
+            fwrite(&emp, sizeof(struct employee), 1, fp);
+        }
+        printf("\n\nEmployee %s updated successfully.", emp.fullName);
+        printf("\n-------------------------------\n");
+
+        fclose(fp1);
+        fclose(fp);
+    } else {
+        printf("No employee found");
+        printf("\n-------------------------------\n");
+    }
 }
 
 void delete() {
-    /* code */
+    char fullName[50];
+    struct employee emp;
+    FILE *fp, *fp1;
+    int found = 0;
+
+    printf("\nEnter employee's full name to delete:\t");
+    takeInput(fullName);
+
+    fp = fopen("Employees.dat", "r");
+    fp1 = fopen("Temp.dat", "w");
+
+    while(fread(&emp, sizeof(struct employee), 1, fp) > 0) {
+        if (!strcmp(emp.fullName, fullName)) {
+            system("cls");
+            found = 1;
+        } else {
+            fwrite(&emp, sizeof(struct employee), 1, fp1);
+        }
+    }
+    fclose(fp1);
+    fclose(fp);
+
+    if (found) {
+        fp = fopen("Employees.dat", "w");
+        fp1 = fopen("Temp.dat", "r");
+
+        while(fread(&emp, sizeof(struct employee), 1, fp1) > 0) {
+            fwrite(&emp, sizeof(struct employee), 1, fp);
+        }
+        printf("\n\nEmployee deleted successfully.");
+        printf("\n-------------------------------\n");
+
+        fclose(fp1);
+        fclose(fp);
+    } else {
+        printf("No employee found");
+        printf("\n-------------------------------\n");
+    }
+}
+
+void total() {
+    system("cls");
+
+    FILE *fp;
+    fp = fopen("Employees.dat", "r");
+    fseek(fp, 0, SEEK_END);
+    int num = ftell(fp) / sizeof(struct employee);
+
+    printf("\nTotal number of employees is %d.", num);
+    printf("\n-----------------------------------------\n\n");
+    fclose(fp);
 }
 
 int main() {
@@ -102,6 +268,7 @@ int main() {
         printf("\n3 - View Employee");
         printf("\n4 - Update Employee");
         printf("\n5 - Delete Employee");
+        printf("\n6 - Number of Employees");
         printf("\n0 - Exit");
 
         printf("\n\nYour choice:\t");
@@ -113,7 +280,16 @@ int main() {
                 display();
             break;
             case 2:
-                store();
+                FILE *fp;
+                struct employee emp;
+                fp = fopen("Employees.dat", "r");
+
+                if (fread(&emp, sizeof(struct employee), 1, fp) > 0) {
+                    append();
+                } else {
+                    store();
+                }
+                fclose(fp);
             break;
             case 3:
                 view();
@@ -123,6 +299,9 @@ int main() {
             break;
             case 5:
                 delete();
+            break;
+            case 6:
+                total();
             break;
             case 0:
                 system("cls");
